@@ -53,13 +53,19 @@ button {
   margin-top: 32px;
 }
 
-.sidebar button {
+.sidebar a {
   padding: 10px 12px;
-  text-align: left;
   color: #e5e7eb;
-  background: transparent;
-  border: 0;
+  text-decoration: none;
   border-radius: 6px;
+}
+
+.sidebar a:hover {
+  background: #1f2937;
+}
+
+.sidebar a.active {
+  background: #1f2937;
 }
 
 .sidebar button:hover {

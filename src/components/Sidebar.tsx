@@ -1,3 +1,5 @@
+import { NavLink } from 'react-router-dom'
+
 function Sidebar() {
   return (
     <aside className="sidebar">
@@ -7,9 +9,9 @@ function Sidebar() {
       </div>
 
       <nav>
-        <button type="button">Dashboard</button>
-        <button type="button">Events</button>
-        <button type="button">Cases</button>
+        <NavLink to="/">Dashboard</NavLink>
+        <NavLink to="/events">Events</NavLink>
+        <NavLink to="/cases">Cases</NavLink>
       </nav>
     </aside>
   )

@@ -1,7 +1,7 @@
 :root {
   font-family: Inter, system-ui, sans-serif;
-  color: #1f2937;
-  background: #f8fafc;
+  color: #e5e7eb;
+  background: #0f172a;
 }
 
 * {
@@ -19,4 +19,53 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  padding: 24px;
+  background: #111827;
+  border-right: 1px solid #1f2937;
+}
+
+.sidebar h1 {
+  margin: 0;
+}
+
+.sidebar p {
+  margin-top: 4px;
+  color: #9ca3af;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.sidebar button {
+  padding: 10px 12px;
+  text-align: left;
+  color: #e5e7eb;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.sidebar button:hover {
+  background: #1f2937;
+}
+
+.app-content {
+  padding: 32px;
 }

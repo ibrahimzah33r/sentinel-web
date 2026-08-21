@@ -1,13 +1,12 @@
-
+import AppLayout from './layouts/AppLayout'
+import DashboardPage from './pages/DashboardPage'
 
 function App() {
   return (
-    <main>
-      <h1>Sentinel</h1>
-      <p>Analyst Console</p>
-    </main>
+    <AppLayout>
+      <DashboardPage />
+    </AppLayout>
   )
 }
-
 
 export default App

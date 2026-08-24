@@ -1,8 +1,9 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { logout } from '../api/auth'
+import { useAuth } from '../auth/AuthContext'
 
 function Sidebar() {
   const navigate = useNavigate()
+  const { logout } = useAuth()
 
   async function handleLogout() {
     await logout()

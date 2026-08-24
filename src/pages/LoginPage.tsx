@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { SubmitEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { login } from '../api/auth'
+import { useAuth } from '../auth/AuthContext'
 
 function LoginPage() {
   const [username, setUsername] = useState('')
@@ -9,6 +9,7 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null)
 
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()

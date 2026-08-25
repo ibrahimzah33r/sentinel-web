@@ -204,3 +204,16 @@ button {
     grid-template-columns: 1fr;
   }
 }
+.event-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.event-actions button {
+  padding: 8px 12px;
+  color: #e5e7eb;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 6px;
+}

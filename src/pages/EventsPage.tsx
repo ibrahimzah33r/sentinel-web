@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getEvents } from '../api/events'
-import type { Event } from '../types/Event'
+import { getEvents, updateEventStatus } from '../api/events'
+import type { Event, EventStatus } from '../types/Event'
 
 function EventsPage() {
   const [events, setEvents] = useState<Event[]>([])
@@ -71,6 +71,27 @@ function EventsPage() {
       )
     })
   }, [events, search, severity, eventType, source])
+
+  async function handleStatusChange(status: EventStatus) {
+    if (!selectedEvent) {
+      return
+    }
+
+    const updatedEvent = await updateEventStatus(
+      selectedEvent.id,
+      status,
+    )
+
+    setSelectedEvent(updatedEvent)
+
+    setEvents((currentEvents) =>
+      currentEvents.map((event) =>
+        event.id === updatedEvent.id
+          ? updatedEvent
+          : event,
+      ),
+    )
+  }
 
   if (loading) {
     return <p>Loading events...</p>
@@ -167,6 +188,9 @@ function EventsPage() {
                 <h3>{selectedEvent.eventType}</h3>
 
                 <dl>
+                  <dt>Status</dt>
+                  <dd>{selectedEvent.status}</dd>
+
                   <dt>Severity</dt>
                   <dd>{selectedEvent.severity}</dd>
 
@@ -180,8 +204,32 @@ function EventsPage() {
                   <dd>{selectedEvent.ipAddress}</dd>
 
                   <dt>Timestamp</dt>
-                  <dd>{new Date(selectedEvent.timestamp).toLocaleString()}</dd>
+                  <dd>
+                    {new Date(
+                      selectedEvent.timestamp,
+                    ).toLocaleString()}
+                  </dd>
                 </dl>
+
+                <div className="event-actions">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleStatusChange('REVIEWED')
+                    }
+                  >
+                    Mark reviewed
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleStatusChange('ESCALATED')
+                    }
+                  >
+                    Escalate
+                  </button>
+                </div>
               </>
             ) : (
               <p>Select an event to view its details.</p>

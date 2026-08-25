@@ -19,4 +19,10 @@ export type Event = {
   message: string
   ipAddress: string
   timestamp: string
+  status: EventStatus
 }
+
+export type EventStatus =
+  | 'NEW'
+  | 'REVIEWED'
+  | 'ESCALATED'

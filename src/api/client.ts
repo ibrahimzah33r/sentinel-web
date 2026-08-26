@@ -4,13 +4,45 @@ type CsrfTokenResponse = {
   token: string
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: 'include',
-  })
+
+export class ApiError extends Error {
+  status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+ 
+async function throwApiError(response: Response): Promise<never> {
+  let message = `Request failed with status ${response.status}`
+
+  try {
+    const body = await response.text()
+
+    if (body) {
+      message = body
+    }
+  } catch {
+    // Keep the default message.
+  }
+
+  throw new ApiError(response.status, message)
+}
+
+
+export async function apiGet<T>(
+  path: string,
+): Promise<T> {
+  const response = await fetch(
+    `${API_BASE_URL}${path}`,
+    {
+      credentials: 'include',
+    },
+  )
 
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`)
+    await throwApiError(response)
   }
 
   return response.json() as Promise<T>
@@ -28,18 +60,18 @@ export async function apiPost<T>(
       'X-CSRF-TOKEN': csrfToken,
       ...(body
         ? {
-          'Content-Type': 'application/json',
-        }
+            'Content-Type': 'application/json',
+          }
         : {}),
     },
     credentials: 'include',
-    body: body ? JSON.stringify(body) : undefined,
+    body: body
+      ? JSON.stringify(body)
+      : undefined,
   })
 
   if (!response.ok) {
-    throw new Error(
-      `Request failed with status ${response.status}`,
-    )
+    await throwApiError(response)
   }
 
   if (response.status === 204) {
@@ -63,9 +95,7 @@ export async function apiPatch<T>(
   })
 
   if (!response.ok) {
-    throw new Error(
-      `Request failed with status ${response.status}`,
-    )
+    await throwApiError(response)
   }
 
   return response.json() as Promise<T>

@@ -1,104 +1,120 @@
-import { useEffect, useMemo, useState } from 'react'
-import { getEvents, updateEventStatus } from '../api/events'
-import type { Event, EventStatus } from '../types/Event'
+import { useEffect, useMemo, useState } from "react";
+import { getEvents, updateEventStatus } from "../api/events";
+import type { Event, EventStatus } from "../types/Event";
+import { createCaseFromEvent } from "../api/cases";
+import { ApiError } from "../api/client";
 
 function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([])
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [search, setSearch] = useState('')
-  const [severity, setSeverity] = useState('ALL')
-  const [eventType, setEventType] = useState('ALL')
-  const [source, setSource] = useState('ALL')
+  const [search, setSearch] = useState("");
+  const [severity, setSeverity] = useState("ALL");
+  const [eventType, setEventType] = useState("ALL");
+  const [source, setSource] = useState("ALL");
 
   useEffect(() => {
     async function loadEvents() {
       try {
-        const data = await getEvents()
-        setEvents(data)
+        const data = await getEvents();
+        setEvents(data);
       } catch {
-        setError('Unable to load events.')
+        setError("Unable to load events.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    loadEvents()
-  }, [])
+    loadEvents();
+  }, []);
 
   const severities = useMemo(
     () => [...new Set(events.map((event) => event.severity))],
     [events],
-  )
+  );
 
   const eventTypes = useMemo(
     () => [...new Set(events.map((event) => event.eventType))],
     [events],
-  )
+  );
 
   const sources = useMemo(
     () => [...new Set(events.map((event) => event.source))],
     [events],
-  )
+  );
 
   const filteredEvents = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase()
+    const normalizedSearch = search.trim().toLowerCase();
 
     return events.filter((event) => {
-      const matchesSeverity =
-        severity === 'ALL' || event.severity === severity
+      const matchesSeverity = severity === "ALL" || event.severity === severity;
 
       const matchesEventType =
-        eventType === 'ALL' || event.eventType === eventType
+        eventType === "ALL" || event.eventType === eventType;
 
-      const matchesSource =
-        source === 'ALL' || event.source === source
+      const matchesSource = source === "ALL" || event.source === source;
 
       const matchesSearch =
-        normalizedSearch === '' ||
+        normalizedSearch === "" ||
         event.message.toLowerCase().includes(normalizedSearch) ||
         event.ipAddress.toLowerCase().includes(normalizedSearch) ||
         event.source.toLowerCase().includes(normalizedSearch) ||
-        event.eventType.toLowerCase().includes(normalizedSearch)
+        event.eventType.toLowerCase().includes(normalizedSearch);
 
       return (
-        matchesSeverity &&
-        matchesEventType &&
-        matchesSource &&
-        matchesSearch
-      )
-    })
-  }, [events, search, severity, eventType, source])
+        matchesSeverity && matchesEventType && matchesSource && matchesSearch
+      );
+    });
+  }, [events, search, severity, eventType, source]);
 
   async function handleStatusChange(status: EventStatus) {
     if (!selectedEvent) {
-      return
+      return;
     }
 
-    const updatedEvent = await updateEventStatus(
-      selectedEvent.id,
-      status,
-    )
+    try {
+      const updatedEvent = await updateEventStatus(selectedEvent.id, status);
 
-    setSelectedEvent(updatedEvent)
+      setSelectedEvent(updatedEvent);
 
-    setEvents((currentEvents) =>
-      currentEvents.map((event) =>
-        event.id === updatedEvent.id
-          ? updatedEvent
-          : event,
-      ),
-    )
+      setEvents((currentEvents) =>
+        currentEvents.map((event) =>
+          event.id === updatedEvent.id ? updatedEvent : event,
+        ),
+      );
+
+      setError(null);
+    } catch {
+      setError("Unable to update event status.");
+    }
+  }
+
+  async function handleCreateCase() {
+    if (!selectedEvent) {
+      return;
+    }
+
+    try {
+      await createCaseFromEvent(selectedEvent.id);
+      setError(null);
+    } catch (exception) {
+      if (exception instanceof ApiError && exception.status === 409) {
+        setError("A case already exists for this event.");
+        return;
+      }
+
+      setError("Unable to create case.");
+    }
   }
 
   if (loading) {
-    return <p>Loading events...</p>
+    return <p>Loading events...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>
+    return <p>{error}</p>;
   }
 
   return (
@@ -204,31 +220,28 @@ function EventsPage() {
                   <dd>{selectedEvent.ipAddress}</dd>
 
                   <dt>Timestamp</dt>
-                  <dd>
-                    {new Date(
-                      selectedEvent.timestamp,
-                    ).toLocaleString()}
-                  </dd>
+                  <dd>{new Date(selectedEvent.timestamp).toLocaleString()}</dd>
                 </dl>
 
                 <div className="event-actions">
                   <button
                     type="button"
-                    onClick={() =>
-                      handleStatusChange('REVIEWED')
-                    }
+                    onClick={() => handleStatusChange("REVIEWED")}
                   >
                     Mark reviewed
                   </button>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      handleStatusChange('ESCALATED')
-                    }
+                    onClick={() => handleStatusChange("ESCALATED")}
                   >
                     Escalate
                   </button>
+                  {selectedEvent.status === "ESCALATED" && (
+                    <button type="button" onClick={handleCreateCase}>
+                      Create case
+                    </button>
+                  )}
                 </div>
               </>
             ) : (
@@ -238,7 +251,7 @@ function EventsPage() {
         </div>
       )}
     </section>
-  )
+  );
 }
 
-export default EventsPage
+export default EventsPage;

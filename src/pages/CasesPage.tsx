@@ -1,82 +1,70 @@
-import { useEffect, useState } from 'react'
-import {
-  getCases,
-  updateCaseStatus,
-} from '../api/cases'
-import type { InvestigationCase } from '../types/Case'
+import { useEffect, useState } from "react";
+import { getCases, updateCaseStatus } from "../api/cases";
+import type { InvestigationCase } from "../types/Case";
 
 function CasesPage() {
-  const [cases, setCases] =
-    useState<InvestigationCase[]>([])
+  const [cases, setCases] = useState<InvestigationCase[]>([]);
 
-  const [selectedCase, setSelectedCase] =
-    useState<InvestigationCase | null>(null)
+  const [selectedCase, setSelectedCase] = useState<InvestigationCase | null>(
+    null,
+  );
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] =
-    useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadCases() {
       try {
-        const data = await getCases()
-        setCases(data)
+        const data = await getCases();
+        setCases(data);
       } catch {
-        setError('Unable to load cases.')
+        setError("Unable to load cases.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    loadCases()
-  }, [])
+    loadCases();
+  }, []);
 
- async function handleStatusChange(
-  status: 'OPEN' | 'CLOSED',
-) {
-  if (!selectedCase) {
-    return
+  async function handleStatusChange(status: "OPEN" | "CLOSED") {
+    if (!selectedCase) {
+      return;
+    }
+
+    try {
+      const updatedCase = await updateCaseStatus(selectedCase.id, status);
+
+      setSelectedCase(updatedCase);
+
+      setCases((currentCases) =>
+        currentCases.map((investigationCase) =>
+          investigationCase.id === updatedCase.id
+            ? updatedCase
+            : investigationCase,
+        ),
+      );
+
+      setError(null);
+    } catch {
+      setError("Unable to update case status.");
+    }
   }
-
-  try {
-    const updatedCase =
-      await updateCaseStatus(
-        selectedCase.id,
-        status,
-      )
-
-    setSelectedCase(updatedCase)
-
-    setCases((currentCases) =>
-      currentCases.map((investigationCase) =>
-        investigationCase.id === updatedCase.id
-          ? updatedCase
-          : investigationCase,
-      ),
-    )
-
-    setError(null)
-  } catch {
-    setError('Unable to update case status.')
-  }
-}
 
   if (loading) {
-    return <p>Loading cases...</p>
+    return <p>Loading cases...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>
+    return <p>{error}</p>;
   }
 
   return (
     <section>
       <h2>Cases</h2>
 
-      <p>
-        Security investigations requiring analyst attention.
-      </p>
+      <p>Security investigations requiring analyst attention.</p>
 
       {cases.length === 0 ? (
         <p>No cases found.</p>
@@ -88,27 +76,17 @@ function CasesPage() {
                 key={investigationCase.id}
                 type="button"
                 className="case-card"
-                onClick={() =>
-                  setSelectedCase(investigationCase)
-                }
+                onClick={() => setSelectedCase(investigationCase)}
               >
                 <div>
-                  <strong>
-                    Case #{investigationCase.id}
-                  </strong>
+                  <strong>Case #{investigationCase.id}</strong>
 
-                  <span>
-                    {investigationCase.status}
-                  </span>
+                  <span>{investigationCase.status}</span>
                 </div>
 
-                <h3>
-                  {investigationCase.eventType}
-                </h3>
+                <h3>{investigationCase.eventType}</h3>
 
-                <p>
-                  {investigationCase.message}
-                </p>
+                <p>{investigationCase.message}</p>
               </button>
             ))}
           </div>
@@ -116,9 +94,7 @@ function CasesPage() {
           <aside className="case-details">
             {selectedCase ? (
               <>
-                <h3>
-                  Case #{selectedCase.id}
-                </h3>
+                <h3>Case #{selectedCase.id}</h3>
 
                 <dl>
                   <dt>Status</dt>
@@ -140,29 +116,21 @@ function CasesPage() {
                   <dd>#{selectedCase.eventId}</dd>
 
                   <dt>Created</dt>
-                  <dd>
-                    {new Date(
-                      selectedCase.createdAt,
-                    ).toLocaleString()}
-                  </dd>
+                  <dd>{new Date(selectedCase.createdAt).toLocaleString()}</dd>
                 </dl>
 
                 <div className="case-actions">
-                  {selectedCase.status === 'OPEN' ? (
+                  {selectedCase.status === "OPEN" ? (
                     <button
                       type="button"
-                      onClick={() =>
-                        handleStatusChange('CLOSED')
-                      }
+                      onClick={() => handleStatusChange("CLOSED")}
                     >
                       Close case
                     </button>
                   ) : (
                     <button
                       type="button"
-                      onClick={() =>
-                        handleStatusChange('OPEN')
-                      }
+                      onClick={() => handleStatusChange("OPEN")}
                     >
                       Reopen case
                     </button>
@@ -170,15 +138,13 @@ function CasesPage() {
                 </div>
               </>
             ) : (
-              <p>
-                Select a case to view its details.
-              </p>
+              <p>Select a case to view its details.</p>
             )}
           </aside>
         </div>
       )}
     </section>
-  )
+  );
 }
 
-export default CasesPage
+export default CasesPage;

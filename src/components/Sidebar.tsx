@@ -1,13 +1,13 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
 function Sidebar() {
-  const navigate = useNavigate()
-  const { logout } = useAuth()
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   async function handleLogout() {
-    await logout()
-    navigate('/login')
+    await logout();
+    navigate("/login");
   }
 
   return (
@@ -22,12 +22,14 @@ function Sidebar() {
         <NavLink to="/events">Events</NavLink>
         <NavLink to="/cases">Cases</NavLink>
 
+        {user?.role === "ADMIN" && <NavLink to="/admin">Admin</NavLink>}
+
         <button type="button" onClick={handleLogout}>
           Logout
         </button>
       </nav>
     </aside>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;

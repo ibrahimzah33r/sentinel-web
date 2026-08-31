@@ -235,6 +235,42 @@ button {
   border-radius: 8px;
 }
 
+.analyst-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  margin-top: 16px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+}
+
+.analyst-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.analyst-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #9ca3af;
+}
+
+.analyst-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.analyst-password-reset {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .case-card dl {
   display: grid;
   grid-template-columns: 100px 1fr;

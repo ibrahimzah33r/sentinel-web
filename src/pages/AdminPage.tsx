@@ -134,56 +134,80 @@ function AdminPage() {
         <h3>Analysts</h3>
 
         {analysts.map((analyst) => (
-          <article key={analyst.id}>
-            <div>
-              <strong>{analyst.username}</strong>
+        <article
+  key={analyst.id}
+  className="analyst-card"
+>
+  <div className="analyst-summary">
+    <strong>{analyst.username}</strong>
 
-              <span>{analyst.role}</span>
+    <div className="analyst-meta">
+      <span>{analyst.role}</span>
 
-              <span>{analyst.enabled ? "Active" : "Disabled"}</span>
-            </div>
+      <span>
+        {analyst.enabled
+          ? 'Active'
+          : 'Disabled'}
+      </span>
+    </div>
+  </div>
 
-            <div>
-              <button
-                type="button"
-                onClick={() => setResetAnalystId(analyst.id)}
-              >
-                Reset password
-              </button>
+  <div className="analyst-actions">
+    <button
+      type="button"
+      onClick={() =>
+        setResetAnalystId(analyst.id)
+      }
+    >
+      Reset password
+    </button>
 
-              <button
-                type="button"
-                onClick={() => handleEnabledChange(analyst)}
-              >
-                {analyst.enabled ? "Disable" : "Enable"}
-              </button>
-            </div>
+    {analyst.role !== 'ADMIN' && (
+      <button
+        type="button"
+        onClick={() =>
+          handleEnabledChange(analyst)
+        }
+      >
+        {analyst.enabled
+          ? 'Disable'
+          : 'Enable'}
+      </button>
+    )}
+  </div>
 
-            {resetAnalystId === analyst.id && (
-              <div>
-                <input
-                  type="password"
-                  value={resetPassword}
-                  placeholder="New password"
-                  onChange={(event) => setResetPassword(event.target.value)}
-                />
+  {resetAnalystId === analyst.id && (
+    <div className="analyst-password-reset">
+      <input
+        type="password"
+        value={resetPassword}
+        placeholder="New password"
+        onChange={(event) =>
+          setResetPassword(
+            event.target.value,
+          )
+        }
+      />
 
-                <button type="button" onClick={handleResetPassword}>
-                  Save password
-                </button>
+      <button
+        type="button"
+        onClick={handleResetPassword}
+      >
+        Save password
+      </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setResetAnalystId(null);
-                    setResetPassword("");
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-          </article>
+      <button
+        type="button"
+        onClick={() => {
+          setResetAnalystId(null)
+          setResetPassword('')
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  )}
+</article>
         ))}
       </section>
     </section>

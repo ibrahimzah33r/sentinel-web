@@ -224,17 +224,15 @@ button {
   margin-top: 24px;
 }
 
+
 .case-card {
+  width: 100%;
   padding: 20px;
+  color: #e5e7eb;
+  text-align: left;
   background: #111827;
   border: 1px solid #1f2937;
   border-radius: 8px;
-}
-
-.case-card > div:first-child {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
 }
 
 .case-card dl {

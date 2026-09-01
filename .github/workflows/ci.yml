@@ -32,7 +32,7 @@ jobs:
         run: npm run build
 
       - name: Build Docker image
-        run: docker build --build-arg VITE_API_BASE_URL=/api -t sentinel-web .
+        run: docker build --build-arg VITE_API_BASE_URL= -t sentinel-web .
 
   publish:
     needs: test
@@ -61,7 +61,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            VITE_API_BASE_URL=/api
+            VITE_API_BASE_URL=
           tags: |
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}

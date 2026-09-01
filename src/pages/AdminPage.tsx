@@ -38,28 +38,34 @@ function AdminPage() {
     }
   }
 
-  async function handleCreateAnalyst() {
-    try {
-      setError(null);
+ async function handleCreateAnalyst() {
+  try {
+    setError(null)
 
-      const createdAnalyst = await createAnalyst({
-        username,
-        password,
-      });
+    const createdAnalyst = await createAnalyst({
+      username,
+      password,
+    })
 
-      setAnalysts((currentAnalysts) => [...currentAnalysts, createdAnalyst]);
+    setAnalysts((currentAnalysts) => [
+      ...currentAnalysts,
+      createdAnalyst,
+    ])
 
-      setUsername("");
-      setPassword("");
-    } catch (error) {
-      if (error instanceof ApiError) {
-        setError(`Unable to create analyst: ${error.message}`);
-        return;
-      }
-
-      setError("Unable to create analyst.");
+    setUsername('')
+    setPassword('')
+  } catch (error) {
+    if (
+      error instanceof ApiError
+      && error.status === 409
+    ) {
+      setError('That username already exists.')
+      return
     }
+
+    setError('Unable to create analyst.')
   }
+}
 
   async function handleEnabledChange(analyst: AnalystResponse) {
     try {

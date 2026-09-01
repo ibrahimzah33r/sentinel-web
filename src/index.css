@@ -271,6 +271,17 @@ button {
   gap: 12px;
 }
 
+.analyst-actions button:disabled,
+.analyst-password-reset button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .case-card dl {
   display: grid;
   grid-template-columns: 100px 1fr;

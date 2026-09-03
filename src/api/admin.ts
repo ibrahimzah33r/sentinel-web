@@ -1,4 +1,4 @@
-import { apiGet, apiPatch, apiPost } from "./client";
+import { apiDelete, apiGet, apiPatch, apiPost } from "./client";
 
 export type AnalystRole = "ADMIN" | "ANALYST";
 
@@ -45,4 +45,8 @@ export function setAnalystEnabled(
   return apiPatch<AnalystResponse>(
     `/api/admin/analysts/${id}/enabled?enabled=${enabled}`,
   );
+}
+
+export function deleteAnalyst(id: number): Promise<void> {
+  return apiDelete<void>(`/api/admin/analysts/${id}`);
 }

@@ -106,3 +106,25 @@ async function getCsrfToken(): Promise<string> {
 
   return data.token;
 }
+
+export async function apiDelete<T>(path: string): Promise<T> {
+  const csrfToken = await getCsrfToken();
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "DELETE",
+    headers: {
+      "X-CSRF-TOKEN": csrfToken,
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    await throwApiError(response);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
+}

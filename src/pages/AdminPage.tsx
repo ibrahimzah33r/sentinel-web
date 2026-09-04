@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { ApiError } from "../api/client";
-
 import {
   createAnalyst,
+  deleteAnalyst,
   getAnalysts,
   resetAnalystPassword,
   setAnalystEnabled,
+  setAnalystRole,
 } from "../api/admin";
 
 import type { AnalystResponse } from "../api/admin";
@@ -87,7 +88,12 @@ function AdminPage() {
             : currentAnalyst,
         ),
       );
-    } catch {
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 400) {
+        setError("The last enabled admin cannot be disabled.");
+        return;
+      }
+
       setError("Unable to update analyst.");
     } finally {
       setActionLoading(null);
@@ -111,6 +117,66 @@ function AdminPage() {
       setResetPassword("");
     } catch {
       setError("Unable to reset password.");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleRoleChange(analyst: AnalystResponse) {
+    const newRole = analyst.role === "ADMIN" ? "ANALYST" : "ADMIN";
+
+    try {
+      setError(null);
+      setActionLoading(`role-${analyst.id}`);
+
+      const updatedAnalyst = await setAnalystRole(analyst.id, newRole);
+
+      setAnalysts((currentAnalysts) =>
+        currentAnalysts.map((currentAnalyst) =>
+          currentAnalyst.id === updatedAnalyst.id
+            ? updatedAnalyst
+            : currentAnalyst,
+        ),
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 400) {
+        setError("The last enabled admin cannot be demoted.");
+        return;
+      }
+
+      setError("Unable to change analyst role.");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleDeleteAnalyst(analyst: AnalystResponse) {
+    const confirmed = window.confirm(
+      `Delete ${analyst.username}? This cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setError(null);
+      setActionLoading(`delete-${analyst.id}`);
+
+      await deleteAnalyst(analyst.id);
+
+      setAnalysts((currentAnalysts) =>
+        currentAnalysts.filter(
+          (currentAnalyst) => currentAnalyst.id !== analyst.id,
+        ),
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 400) {
+        setError("The last enabled admin cannot be deleted.");
+        return;
+      }
+
+      setError("Unable to delete analyst.");
     } finally {
       setActionLoading(null);
     }
@@ -171,22 +237,39 @@ function AdminPage() {
               >
                 Reset password
               </button>
-
-              {analyst.role !== "ADMIN" && (
-                <button
-                  type="button"
-                  onClick={() => handleEnabledChange(analyst)}
-                  disabled={actionLoading === `enabled-${analyst.id}`}
-                >
-                  {actionLoading === `enabled-${analyst.id}`
-                    ? analyst.enabled
-                      ? "Disabling..."
-                      : "Enabling..."
-                    : analyst.enabled
-                      ? "Disable"
-                      : "Enable"}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => handleRoleChange(analyst)}
+                disabled={actionLoading === `role-${analyst.id}`}
+              >
+                {actionLoading === `role-${analyst.id}`
+                  ? "Updating..."
+                  : analyst.role === "ADMIN"
+                    ? "Make analyst"
+                    : "Make admin"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteAnalyst(analyst)}
+                disabled={actionLoading === `delete-${analyst.id}`}
+              >
+                {actionLoading === `delete-${analyst.id}`
+                  ? "Deleting..."
+                  : "Delete"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleEnabledChange(analyst)}
+                disabled={actionLoading === `enabled-${analyst.id}`}
+              >
+                {actionLoading === `enabled-${analyst.id}`
+                  ? analyst.enabled
+                    ? "Disabling..."
+                    : "Enabling..."
+                  : analyst.enabled
+                    ? "Disable"
+                    : "Enable"}
+              </button>
             </div>
 
             {resetAnalystId === analyst.id && (

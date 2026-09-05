@@ -243,20 +243,12 @@ function AdminPage() {
                 disabled={actionLoading === `role-${analyst.id}`}
               >
                 {actionLoading === `role-${analyst.id}`
-                  ? "Updating..."
+                  ? "Updating role..."
                   : analyst.role === "ADMIN"
-                    ? "Make analyst"
-                    : "Make admin"}
+                    ? "Demote to analyst"
+                    : "Promote to admin"}
               </button>
-              <button
-                type="button"
-                onClick={() => handleDeleteAnalyst(analyst)}
-                disabled={actionLoading === `delete-${analyst.id}`}
-              >
-                {actionLoading === `delete-${analyst.id}`
-                  ? "Deleting..."
-                  : "Delete"}
-              </button>
+
               <button
                 type="button"
                 onClick={() => handleEnabledChange(analyst)}
@@ -267,8 +259,18 @@ function AdminPage() {
                     ? "Disabling..."
                     : "Enabling..."
                   : analyst.enabled
-                    ? "Disable"
-                    : "Enable"}
+                    ? "Disable account"
+                    : "Enable account"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleDeleteAnalyst(analyst)}
+                disabled={actionLoading === `delete-${analyst.id}`}
+              >
+                {actionLoading === `delete-${analyst.id}`
+                  ? "Deleting..."
+                  : "Delete account"}
               </button>
             </div>
 

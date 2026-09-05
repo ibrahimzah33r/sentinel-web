@@ -50,3 +50,9 @@ export function setAnalystEnabled(
 export function deleteAnalyst(id: number): Promise<void> {
   return apiDelete<void>(`/api/admin/analysts/${id}`);
 }
+
+export function setAnalystRole(id: number, role: AnalystRole,): Promise<AnalystResponse> {
+  return apiPatch<AnalystResponse>(
+    `/api/admin/analysts/${id}/role?role=${role}`,
+  );
+}
